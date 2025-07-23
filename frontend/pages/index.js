@@ -213,7 +213,7 @@ export default function ChatApp() {
 
 
 
-  
+
   const deleteChat = async (chatId, event) => {
     // Prevent event bubbling - handle undefined event
     if (event && typeof event.stopPropagation === 'function') {
@@ -331,9 +331,9 @@ export default function ChatApp() {
 
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-300">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white flex flex-col">
+      <div className="w-64 bg-gray-700 text-white flex flex-col">
         <div className="p-4">
           <button
             onClick={createNewChat}
@@ -515,14 +515,14 @@ export default function ChatApp() {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <h2 className="text-2xl font-semibold text-gray-600 mb-4">
-                Welcome to Cointab Chat
+                Welcome to Cointab ChatGPT
               </h2>
               <p className="text-gray-500 mb-6">
                 What can I help with
               </p>
               <button
                 onClick={createNewChat}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+                className="bg-black hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
               >
                 Start New Chat
               </button>
@@ -531,5 +531,5 @@ export default function ChatApp() {
         )}
       </div>
     </div>
-  );
+  );S
 }
