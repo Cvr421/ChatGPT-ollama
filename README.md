@@ -1,6 +1,8 @@
 # ChatGPT-Ollama
 
 A ChatGPT-like web interface powered by Ollama for running large language models locally. This application provides a familiar chat interface while leveraging the power of locally hosted AI models through Ollama.
+### video
+[Cointab.webm](https://github.com/user-attachments/assets/d4824b23-77e8-451a-b935-1fba54727904)
 
 ## Tech Stack
 
@@ -83,7 +85,7 @@ sudo apt install postgresql postgresql-contrib
 createdb chatgpt_ollama
 ```
 
-### 3. Local run instructions
+### 3. Project Setup
 
 #### Clone Repository
 ```bash
