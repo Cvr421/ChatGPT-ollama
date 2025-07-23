@@ -1,7 +1,7 @@
 // frontend/pages/index.js
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-
+// import MessageDisplay from './MessageDisplay';
 const API_BASE_URL = 'http://localhost:3001/api';
 
 export default function ChatApp() {
@@ -210,6 +210,10 @@ export default function ChatApp() {
   // };
 
 
+
+
+
+  
   const deleteChat = async (chatId, event) => {
     // Prevent event bubbling - handle undefined event
     if (event && typeof event.stopPropagation === 'function') {
@@ -268,6 +272,44 @@ export default function ChatApp() {
   };
 
 
+  const startRenaming = (chat, event) => {
+    event.stopPropagation();
+    setEditingChatId(chat.id);
+    setEditingTitle(chat.title);
+  };
+
+  const [editingChatId, setEditingChatId] = useState(null);
+  const [editingTitle, setEditingTitle] = useState('');
+
+
+  const saveRename = async (chatId) => {
+    try {
+      await axios.put(`${API_BASE_URL}/chat/${chatId}`, {
+        title: editingTitle
+      });
+
+      // Update local state
+      setChats(prev => prev.map(chat =>
+        chat.id === chatId ? { ...chat, title: editingTitle } : chat
+      ));
+
+      // Update current chat if it's the one being renamed
+      if (currentChat && currentChat.id === chatId) {
+        setCurrentChat(prev => ({ ...prev, title: editingTitle }));
+      }
+
+      setEditingChatId(null);
+      setEditingTitle('');
+    } catch (error) {
+      console.error('Failed to rename chat:', error);
+      setError('Failed to rename chat');
+    }
+  };
+
+  const cancelRename = () => {
+    setEditingChatId(null);
+    setEditingTitle('');
+  };
 
 
 
@@ -288,18 +330,6 @@ export default function ChatApp() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -307,7 +337,7 @@ export default function ChatApp() {
         <div className="p-4">
           <button
             onClick={createNewChat}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            className="w-full bg-black  text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
             + New Chat
           </button>
@@ -318,19 +348,57 @@ export default function ChatApp() {
             {(chats || []).filter(chat => chat && chat.id).map(chat => (
               <div
                 key={chat.id}
-                onClick={() => loadChat(chat.id)}
+                onClick={() => editingChatId !== chat.id && loadChat(chat.id)}
                 className={`p-3 mb-2 rounded cursor-pointer hover:bg-gray-700 transition-colors group ${currentChat?.id === chat.id ? 'bg-gray-700' : ''
                   }`}
               >
                 <div className="flex justify-between items-center">
                   <div className="flex-1 truncate">
-                    <div className="text-sm font-medium truncate">
+
+                    {editingChatId === chat.id ? (
+                      <input
+                        type="text"
+                        value={editingTitle}
+                        onChange={(e) => setEditingTitle(e.target.value)}
+                        onBlur={() => saveRename(chat.id)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            saveRename(chat.id);
+                          } else if (e.key === 'Escape') {
+                            cancelRename();
+                          }
+                        }}
+                        className="w-full bg-gray-800 text-white text-sm font-medium px-2 py-1 rounded border border-gray-600 focus:outline-none focus:border-blue-500"
+                        autoFocus
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      <div className="text-sm font-medium truncate">
+                        {chat.title}
+                      </div>
+                    )}
+
+                    {/* <div className="text-sm font-medium truncate">
                       {chat.title}
-                    </div>
+                    </div> */}
+
                     <div className="text-xs text-gray-400">
                       {new Date(chat.created_at).toLocaleDateString()}
                     </div>
                   </div>
+
+                  {/* Remaing chat title */}
+                  <div className="opacity-0 group-hover:opacity-100 flex space-x-1 ml-2 transition-opacity">
+                    <button
+                      onClick={(e) => startRenaming(chat, e)}
+                      className="text-blue-400 hover:text-blue-300 text-sm"
+                      title="Rename chat"
+                    >
+                      ✏️
+                    </button>
+
+                  </div>
+
                   <button
                     onClick={(e) => deleteChat(chat.id, e)}
                     className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 ml-2 transition-opacity"
@@ -343,6 +411,10 @@ export default function ChatApp() {
           </div>
         </div>
       </div>
+
+
+
+
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
@@ -369,7 +441,14 @@ export default function ChatApp() {
                       : 'bg-black border border-gray-200'
                       }`}
                   >
+
+                    {/* <MessageDisplay content={message.content} role={message.role} /> */}
+
+
+
+
                     <pre className="whitespace-pre-wrap font-sans">
+
                       {message.content}
                     </pre>
                   </div>
@@ -390,6 +469,11 @@ export default function ChatApp() {
 
               <div ref={messagesEndRef} />
             </div>
+
+
+
+
+
 
             {/* Input Area */}
             <div className="bg-white border-t p-4">
@@ -415,7 +499,7 @@ export default function ChatApp() {
                   <button
                     onClick={sendMessage}
                     disabled={!inputValue.trim()}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+                    className="bg-black disabled:bg-gray-400 text-white font-medium py-3 px-6 rounded-lg transition-colors"
                   >
                     Send
                   </button>
